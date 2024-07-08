@@ -5,7 +5,6 @@ using Game.Modding;
 using Game.Prefabs;
 using Game.SceneFlow;
 using JetBrains.Annotations;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Colossal.IO.AssetDatabase;
 using Unity.Collections;
@@ -72,7 +71,7 @@ public partial class UpdateDataSystem : GameSystemBase
     /// <typeparam name="TMod"></typeparam>
     /// <param name="prefabSystem"></param>
     /// <param name="data"></param>
-    private void UpdateData<T, TMod>(PrefabSystem prefabSystem, Dictionary<string, TMod> data) where T : unmanaged, IComponentData where TMod : struct, ILoadFromGame<T>
+    private void UpdateData<T, TMod>(PrefabSystem prefabSystem, TMod data) where T : unmanaged, IComponentData where TMod : ILoadFromGame<T>
     {
         using var entities = QueryPrefabs<T>();
         foreach (var entity in entities)
@@ -80,12 +79,9 @@ public partial class UpdateDataSystem : GameSystemBase
             var prefabName = GetPrefabName(prefabSystem, entity);
             if (prefabName is null)
                 continue;
-            if(data.TryGetValue(prefabName, out var moddedData))
-            {
-                var componentData = EntityManager.GetComponentData<T>(entity);
-                moddedData.Set(componentData);
-                EntityManager.SetComponentData(entity, componentData);
-            }
+            var componentData = EntityManager.GetComponentData<T>(entity);
+            data.Set(prefabName, ref componentData);
+            EntityManager.SetComponentData(entity, componentData);
         }
     }
 
@@ -130,29 +126,6 @@ public partial class LoadDefaultDataSystem : GameSystemBase
         Mod.Log.Info($"Accessing default track data...");
         LoadDefaultData<Game.Prefabs.PathfindTrackData, PathfindTrackData>(prefabSystem, Mod.Setting.DefaultTrackData);
         Mod.Setting.ApplyAndSave();
-        //AssetDatabase.global.SaveSettings();
-        //Mod.Setting.Save();//.ApplyAndSave();
-        //var m_UnsafeCrosswalkCost = new PathfindCosts(time: 0f, behaviour: 500f, money: 0f, comfort: 50f);
-        //var entities = QueryPrefabs<PathfindPedestrianData>();
-
-        //foreach (var entity in entities)
-        //{
-        //    var name = GetPrefabName(prefabSystem, entity);
-        //    var componentData = EntityManager.GetComponentData<PathfindPedestrianData>(entity);
-        //    //Mod.log.Info($"Setting pedestrian walking costs for prefab '{name}', changing from: {oldCosts.m_UnsafeCrosswalkCost.m_Value} to: {m_UnsafeCrosswalkCost.m_Value}");
-        //    Mod.log.Info($"new Group(\"{name}\", \"{name}\", \"{name}\", " +
-        //        $"new PathfindCosts({componentData.m_WalkingCost.m_Value.x}, {componentData.m_WalkingCost.m_Value.y}, {componentData.m_WalkingCost.m_Value.z}, {componentData.m_WalkingCost.m_Value.w}), " +
-        //        $"new PathfindCosts({componentData.m_CrosswalkCost.m_Value.x}, {componentData.m_CrosswalkCost.m_Value.y}, {componentData.m_CrosswalkCost.m_Value.z}, {componentData.m_CrosswalkCost.m_Value.w}), " +
-        //        $"new PathfindCosts({componentData.m_UnsafeCrosswalkCost.m_Value.x}, {componentData.m_UnsafeCrosswalkCost.m_Value.y}, {componentData.m_UnsafeCrosswalkCost.m_Value.z}, {componentData.m_UnsafeCrosswalkCost.m_Value.w}), " +
-        //        $"new PathfindCosts({componentData.m_SpawnCost.m_Value.x}, {componentData.m_SpawnCost.m_Value.y}, {componentData.m_SpawnCost.m_Value.z}, {componentData.m_SpawnCost.m_Value.w})),");
-        //    componentData.m_WalkingCost = componentData.m_WalkingCost;
-        //    componentData.m_CrosswalkCost = componentData.m_CrosswalkCost;
-        //    componentData.m_UnsafeCrosswalkCost = m_UnsafeCrosswalkCost;
-        //    componentData.m_SpawnCost = componentData.m_SpawnCost;
-        //    EntityManager.SetComponentData(entity, componentData);
-        //}
-
-        //entities.Dispose();
     }
 
     protected override void OnUpdate() { }
@@ -188,7 +161,7 @@ public partial class LoadDefaultDataSystem : GameSystemBase
     /// <typeparam name="TMod"></typeparam>
     /// <param name="prefabSystem"></param>
     /// <param name="data"></param>
-    private void LoadDefaultData<T, TMod>(PrefabSystem prefabSystem, Dictionary<string, TMod> data) where T : unmanaged, IComponentData where TMod : struct, ILoadFromGame<T>
+    private void LoadDefaultData<T, TMod>(PrefabSystem prefabSystem, TMod data) where T : unmanaged, IComponentData where TMod : ILoadFromGame<T>
     {
         using var entities = QueryPrefabs<T>();
         foreach (var entity in entities)
@@ -200,9 +173,7 @@ public partial class LoadDefaultDataSystem : GameSystemBase
                 continue;
             }
             var componentData = EntityManager.GetComponentData<T>(entity);
-            var value = default(TMod);
-            value.Load(componentData);
-            data[prefabName] = value;
+            data.Load(prefabName, componentData);
         }
     }
 }

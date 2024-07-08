@@ -4,7 +4,7 @@ namespace PathfindingCosts
 {
     public interface ILoadFromGame<T> where T : unmanaged, IComponentData
     {
-        public void Load(T data);
-        public void Set(T data);
+        public void Load(string preset, T data);
+        public void Set(string preset, ref T data);
     }
 }

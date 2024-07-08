@@ -29,17 +29,17 @@ public class Setting : ModSetting
     public string ReadMe3 { get; set; } = "";
     // These dictionaries store pathfinding costs for different presets, by preset name.
     [SettingsUIHidden]
-    public Dictionary<string, PathfindCarData> DefaultCarData { get; set; } = new(); // Cars
+    public PathfindCarData DefaultCarData { get; set; } = new(); // Cars
     [SettingsUIHidden]
-    public Dictionary<string, PathfindPedestrianData> DefaultPedestrianData { get; set; } = new(); // Pedestrians
+    public PathfindPedestrianData DefaultPedestrianData { get; set; } = new(); // Pedestrians
     [SettingsUIHidden]
-    public Dictionary<string, PathfindTrackData> DefaultTrackData { get; set; } = new(); // trains?
+    public PathfindTrackData DefaultTrackData { get; set; } = new(); // trains?
     [SettingsUIHidden]
-    public Dictionary<string, PathfindCarData> CarData { get; set; } = new(); // Cars
+    public PathfindCarData CarData { get; set; } = new(); // Cars
     [SettingsUIHidden]
-    public Dictionary<string, PathfindPedestrianData> PedestrianData { get; set; } = new(); // Pedestrians
+    public PathfindPedestrianData PedestrianData { get; set; } = new(); // Pedestrians
     [SettingsUIHidden]
-    public Dictionary<string, PathfindTrackData> TrackData { get; set; } = new(); // trains?
+    public PathfindTrackData TrackData { get; set; } = new(); // trains?
 
     [Exclude]
     [SettingsUIHidden]

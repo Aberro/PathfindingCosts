@@ -1,31 +1,37 @@
-﻿using Game.Pathfind;
+﻿using System.Collections.Generic;
+using Game.Pathfind;
 
 namespace PathfindingCosts
 {
-    public struct PathfindTrackData : ILoadFromGame<Game.Prefabs.PathfindTrackData>
+    public class PathfindTrackData : ILoadFromGame<Game.Prefabs.PathfindTrackData>
     {
-        public PathfindCosts? DrivingCost;
-        public PathfindCosts? TwowayCost;
-        public PathfindCosts? SwitchCost;
-        public PathfindCosts? DiamondCrossingCost;
-        public PathfindCosts? SpawnCost;
+        public Dictionary<string, PathfindCosts?> DrivingCost = new();
+        public Dictionary<string, PathfindCosts?> TwowayCost = new();
+        public Dictionary<string, PathfindCosts?> SwitchCost = new();
+        public Dictionary<string, PathfindCosts?> DiamondCrossingCost = new();
+        public Dictionary<string, PathfindCosts?> SpawnCost = new();
 
-        public void Load(Game.Prefabs.PathfindTrackData data)
+        public void Load(string preset, Game.Prefabs.PathfindTrackData data)
         {
-            this.DrivingCost = new(data.m_DrivingCost);
-            this.TwowayCost = new(data.m_TwowayCost);
-            this.SwitchCost = new(data.m_SwitchCost);
-            this.DiamondCrossingCost = new(data.m_DiamondCrossingCost);
-            this.SpawnCost = new(data.m_SpawnCost);
+            this.DrivingCost[preset] = new(data.m_DrivingCost);
+            this.TwowayCost[preset] = new(data.m_TwowayCost);
+            this.SwitchCost[preset] = new(data.m_SwitchCost);
+            this.DiamondCrossingCost[preset] = new(data.m_DiamondCrossingCost);
+            this.SpawnCost[preset] = new(data.m_SpawnCost);
         }
 
-        public void Set(Game.Prefabs.PathfindTrackData data)
+        public void Set(string preset, ref Game.Prefabs.PathfindTrackData data)
         {
-            data.m_DrivingCost = this.DrivingCost?.ToGameValue() ?? data.m_DrivingCost;
-            data.m_TwowayCost = this.TwowayCost?.ToGameValue() ?? data.m_TwowayCost;
-            data.m_SwitchCost = this.SwitchCost?.ToGameValue() ?? data.m_SwitchCost;
-            data.m_DiamondCrossingCost = this.DiamondCrossingCost?.ToGameValue() ?? data.m_DiamondCrossingCost;
-            data.m_SpawnCost = this.SpawnCost?.ToGameValue() ?? data.m_SpawnCost;
+            if(this.DrivingCost.ContainsKey(preset))
+                data.m_DrivingCost = this.DrivingCost[preset]?.ToGameValue() ?? data.m_DrivingCost;
+            if(this.TwowayCost.ContainsKey(preset))
+                data.m_TwowayCost = this.TwowayCost[preset]?.ToGameValue() ?? data.m_TwowayCost;
+            if(this.SwitchCost.ContainsKey(preset))
+                data.m_SwitchCost = this.SwitchCost[preset]?.ToGameValue() ?? data.m_SwitchCost;
+            if(this.DiamondCrossingCost.ContainsKey(preset))
+                data.m_DiamondCrossingCost = this.DiamondCrossingCost[preset]?.ToGameValue() ?? data.m_DiamondCrossingCost;
+            if(this.SpawnCost.ContainsKey(preset))
+                data.m_SpawnCost = this.SpawnCost[preset]?.ToGameValue() ?? data.m_SpawnCost;
         }
     }
 }
